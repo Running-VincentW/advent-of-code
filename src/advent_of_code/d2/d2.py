@@ -1,8 +1,7 @@
-import re
-from dataclasses import dataclass
-import itertools
-from functools import reduce
 import operator
+from collections import defaultdict
+from dataclasses import dataclass
+from functools import reduce
 
 
 @dataclass
@@ -11,68 +10,52 @@ class Game:
     draws: list[dict[str, int]]
 
 
-test = "Game 1: 10 green, 9 blue, 1 red; 1 red, 7 green; 11 green, 6 blue; 8 blue, 12 green"
-
-
 class CubeGame:
-    def _parse_one_line(self, line: str) -> Game:
-        info, games = line.split(":")
-        game_id = int(info.split(" ")[1])
-        games = games.split(";")
-        draws = []
-        for game in games:
-            color_info = game.split(",")
-            draw = {}
-            for c in color_info:
-                draw_n, draw_color = c.strip().split(" ")
-                draw_n = int(draw_n)
-                draw_color = draw_color
-                draw[draw_color] = draw_n
-            draws.append(draw)
+    @staticmethod
+    def _parse_one_line(line: str) -> Game:
+        info, raw_draws = line.split(":")
+        game_id = int(info.split()[1])
+        draws = [
+            {color: int(qty) for qty, color in (c.strip().split() for c in draw.split(","))}
+            for draw in raw_draws.split(";")
+        ]
         return Game(game_id=game_id, draws=draws)
 
     def parse(self, doc: str) -> list[Game]:
         return [self._parse_one_line(line) for line in doc.splitlines()]
 
-    def _get_minimum_per_game(self, game: Game) -> dict[str, int]:
-        bag_min = {}
+    @staticmethod
+    def _get_minimum_per_game(game: Game) -> dict[str, int]:
+        bag_min = defaultdict(int)
         for draw in game.draws:
-            for draw_color, draw_count in draw.items():
-                # does the color in the bag exceed the amt in hand?
-                bag_count = bag_min.get(draw_color, 0)
-                new_bag_count = max(bag_count, draw_count)
-                bag_min[draw_color] = new_bag_count
-
-        return bag_min
+            for draw_color, draw_qty in draw.items():
+                bag_min[draw_color] = max(bag_min[draw_color], draw_qty)
+        return dict(bag_min)
 
     def _get_power_of_game(self, game: Game) -> int:
         bag_min = self._get_minimum_per_game(game)
-        power = reduce(operator.mul, list(bag_min.values()))
-        return power
+        return reduce(operator.mul, bag_min.values())
 
-    def get_games_power(self, games: list[Game]):
+    def get_games_power(self, games: list[Game]) -> int:
         powers = [self._get_power_of_game(game) for game in games]
-        power = reduce(operator.add, powers)
-        return power
+        return sum(powers)
 
-    def _assert_if_game_is_valid_with_bag(
-        self, bag: dict[str, int], game: Game
-    ) -> bool:
+    @staticmethod
+    def _assert_if_game_is_valid_with_bag(bag: dict[str, int], game: Game) -> bool:
         for draw in game.draws:
             for draw_color, draw_count in draw.items():
-                # does the color in the bag exceed the amt in hand?
-                bag_count = bag.get(draw_color, 0)
-                if draw_count > bag_count:
+                if draw_count > bag.get(draw_color, 0):
                     return False
         return True
 
-    def check_games_validity(self, bag: dict[str, int], games: list[Game]):
+    def _check_games_validity(self, bag: dict[str, int], games: list[Game]) -> list[bool]:
         return [self._assert_if_game_is_valid_with_bag(bag, game) for game in games]
 
-    def get_valid_games_index(self, bag: dict[str, int], games: list[Game]):
-        bool_mask = self.check_games_validity(bag, games)
-        valid_games = list(itertools.compress(games, bool_mask))
+    def get_valid_games_index(self, bag: dict[str, int], games: list[Game]) -> list[int]:
+        games_validity = self._check_games_validity(bag, games)
+        valid_games = [game for game, valid in zip(games, games_validity) if valid]
         return [game.game_id for game in valid_games]
+
 
 
 if __name__ == "__main__":
