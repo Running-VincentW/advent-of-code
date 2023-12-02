@@ -1,21 +1,10 @@
-from functools import reduce
-import re
-
-
 class ElfDocumentParser:
-    _rows: list[int]
-
-    @property
-    def rows(self) -> list[int]:
-        """Return rows of numbers from each row of the document"""
-        return self._rows
-
-    @property
-    def total(self) -> int:
-        return self._total
+    def __init__(self):
+        self._rows = []
+        self._total = 0
 
     @staticmethod
-    def _map_spelled_out_digits(row: str) -> str:
+    def _map_spelled_out_digits(row):
         translate_mapping = {
             "one": "o1e",
             "two": "t2o",
@@ -27,25 +16,34 @@ class ElfDocumentParser:
             "eight": "e8t",
             "nine": "n9e",
         }
-        for k, v in translate_mapping.items():
-            row = row.replace(k, v)
+        for word, replacement in translate_mapping.items():
+            row = row.replace(word, replacement)
         return row
 
     @staticmethod
-    def _number_in_row(row: str) -> int:
+    def _number_in_row(row):
         row_digits = [c for c in row if c.isdigit()]
-        if len(row_digits) == 0:
+        if not row_digits:
             return 0
         digit_10th = int(row_digits[0])
         digit_1 = int(row_digits[-1])
         return digit_10th * 10 + digit_1
 
-    def parse(self, raw_doc: str):
+    def parse(self, raw_doc):
         """Read in the document"""
         rows = raw_doc.splitlines()
-        rows = (self._map_spelled_out_digits(row) for row in rows)
-        self._rows = [self._number_in_row(row) for row in rows]
+        modified_rows = (self._map_spelled_out_digits(row) for row in rows)
+        self._rows = [self._number_in_row(row) for row in modified_rows]
         self._total = sum(self._rows)
+
+    @property
+    def rows(self):
+        """Return rows of numbers from each row of the document"""
+        return self._rows
+
+    @property
+    def total(self):
+        return self._total
 
 
 if __name__ == "__main__":

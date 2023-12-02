@@ -16,7 +16,10 @@ class CubeGame:
         info, raw_draws = line.split(":")
         game_id = int(info.split()[1])
         draws = [
-            {color: int(qty) for qty, color in (c.strip().split() for c in draw.split(","))}
+            {
+                color: int(qty)
+                for qty, color in (c.strip().split() for c in draw.split(","))
+            }
             for draw in raw_draws.split(";")
         ]
         return Game(game_id=game_id, draws=draws)
@@ -48,14 +51,17 @@ class CubeGame:
                     return False
         return True
 
-    def _check_games_validity(self, bag: dict[str, int], games: list[Game]) -> list[bool]:
+    def _check_games_validity(
+        self, bag: dict[str, int], games: list[Game]
+    ) -> list[bool]:
         return [self._assert_if_game_is_valid_with_bag(bag, game) for game in games]
 
-    def get_valid_games_index(self, bag: dict[str, int], games: list[Game]) -> list[int]:
+    def get_valid_games_index(
+        self, bag: dict[str, int], games: list[Game]
+    ) -> list[int]:
         games_validity = self._check_games_validity(bag, games)
         valid_games = [game for game, valid in zip(games, games_validity) if valid]
         return [game.game_id for game in valid_games]
-
 
 
 if __name__ == "__main__":
