@@ -58,7 +58,7 @@ Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"""
 
         assert set(actual) == set([1, 2, 5])
 
-    def test_parse_one_line(self):
+    def test_get_minimum_per_game(self):
         test = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green"
         uut = CubeGame()
         game = uut._parse_one_line(test)
