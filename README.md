@@ -1,3 +1,5 @@
+[![Python application](https://github.com/Running-VincentW/advent-of-code/actions/workflows/python-app.yml/badge.svg?branch=main)](https://github.com/Running-VincentW/advent-of-code/actions/workflows/python-app.yml)
+
 # Advent of Code 2023 Python Project
 
 Welcome to my Advent of Code 2023 Python project repository! This project contains source code that I've created for my participation in the Advent of Code event, celebrating the festive season with coding challenges.
