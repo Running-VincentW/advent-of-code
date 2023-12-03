@@ -3,6 +3,7 @@ from collections import defaultdict
 import string
 from typing import Any, Tuple
 
+
 @dataclass(frozen=True)
 class Point:
     x: int
@@ -10,10 +11,11 @@ class Point:
 
     def __hash__(self):
         return hash((self.x, self.y))
-    
+
     def __eq__(self, other):
         return isinstance(other, Point) and self.x == other.x and self.y == other.y
-    
+
+
 @dataclass(frozen=True)
 class PointData:
     n: int
@@ -21,16 +23,15 @@ class PointData:
 
 
 class EngineParser:
-
     map_width: int
     map_height: int
     point_dict: dict[Point, PointData]
-    char_pts : dict[Point, str]
+    char_pts: dict[Point, str]
 
     def parse_map(self, input_str):
         self.char_pts = {}
         self.point_dict = {}
-        lines = input_str.strip().split('\n')
+        lines = input_str.strip().split("\n")
 
         x, y = 0, 0
         point_id = 0
@@ -41,10 +42,8 @@ class EngineParser:
 
         def register_number(x_from: int, x_to: int, y: int):
             nonlocal point_id, n, is_reading_num
-            point_data = PointData(
-                n=int(n), _id=point_id
-            )
-            for x in range (x_from, x_to + 1):
+            point_data = PointData(n=int(n), _id=point_id)
+            for x in range(x_from, x_to + 1):
                 self.point_dict[Point(x, y)] = point_data
             point_id += 1
             n = ""
@@ -53,16 +52,15 @@ class EngineParser:
         for y, line in enumerate(lines):
             is_reading_num = False
             for x, char in enumerate(line):
-                
                 if char not in string.digits and is_reading_num:
-                    register_number(start_x, x-1, y)
+                    register_number(start_x, x - 1, y)
 
-                if char != '.':
+                if char != ".":
                     point = Point(x, y)
 
                     if char in string.punctuation:
                         self.char_pts[point] = char
-                    
+
                     elif char in string.digits:
                         if not is_reading_num:
                             start_x = x
@@ -70,21 +68,20 @@ class EngineParser:
                         n = f"{n}{char}"
 
             if is_reading_num:
-                register_number(start_x, x-1, y)
+                register_number(start_x, x - 1, y)
 
         self.map_width = x + 1
         self.map_height = y + 1
 
-
     def _get_surround_points(self, point: Point) -> list[Point]:
-        def is_coordinate_valid(x:int , y:int):
+        def is_coordinate_valid(x: int, y: int):
             is_x_valid = x >= 0 and x < self.map_width
             is_y_valid = y >= 0 and y < self.map_height
             return is_x_valid and is_y_valid
-        
+
         neighbour_pts: list[Point] = []
-        for x_offset in range (-1, 2):
-            for y_offset in range (-1, 2):
+        for x_offset in range(-1, 2):
+            for y_offset in range(-1, 2):
                 if x_offset == 0 and y_offset == 0:
                     continue
                 x, y = point.x + x_offset, point.y + y_offset
@@ -94,7 +91,7 @@ class EngineParser:
 
     def get_engine_schematics(self) -> Tuple[list[int], list[int]]:
         registered_ids = []
-        schematic_num : list[int] = []
+        schematic_num: list[int] = []
         gear = []
 
         for point, char in self.char_pts.items():
@@ -113,21 +110,20 @@ class EngineParser:
                 if other_cell and other_cell._id not in registered_ids:
                     registered_ids.append(other_cell._id)
                     schematic_num.append(other_cell.n)
-            
-            is_gear = (char == "*" and neighbour_count == 2)
+
+            is_gear = char == "*" and neighbour_count == 2
             if is_gear:
                 gear.append(neighbour_nums[0] * neighbour_nums[1])
 
         return schematic_num, gear
-    
+
     def get_engine_schematics_sum(self) -> int:
         schematic_num, _ = self.get_engine_schematics()
         return sum(schematic_num)
-    
+
     def get_gear_sum(self) -> int:
-        _ , gear = self.get_engine_schematics()
+        _, gear = self.get_engine_schematics()
         return sum(gear)
-    
 
 
 if __name__ == "__main__":
