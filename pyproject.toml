@@ -9,6 +9,8 @@ packages = [{include = "advent_of_code", from = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
+matplotlib = "^3.8.2"
+networkx = "^3.2.1"
 
 
 [tool.poetry.group.dev.dependencies]

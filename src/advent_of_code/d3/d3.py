@@ -1,7 +1,6 @@
 from dataclasses import dataclass
-from collections import defaultdict
 import string
-from typing import Any, Tuple
+from typing import Tuple
 
 
 @dataclass(frozen=True)

@@ -11,8 +11,6 @@ test_map = """467..114..
 ...$.*....
 .664.598.."""
 
-from pprint import pprint
-
 
 class TestEngineParser:
     def test_read_int_from_map(self):
