@@ -1,3 +1,5 @@
+from advent_of_code.d5 import SeedReader
+
 input_doc = """seeds: 79 14 55 13
 
 seed-to-soil map:
@@ -32,8 +34,6 @@ humidity-to-location map:
 60 56 37
 56 93 4
 """
-
-from advent_of_code.d5 import SeedReader
 
 
 class TestSeedReader:
